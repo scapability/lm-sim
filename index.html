@@ -1,5 +1,11 @@
-<!DOCTYPE html>
-
+F<!DOCTYPE html>
+<!--
+  ОБУЧАЮЩАЯ ВЕРСИЯ ФАЙЛА
+  Что это: одностраничный HTML-прототип симулятора руководителя.
+  Как с ним работать: сначала ищите большие блоки по комментариям ===== ... =====, потом уже меняйте числа и тексты внутри функций.
+  Самые безопасные места для первых правок: тексты интерфейса, стоимость действий, пороги scoreBand(), тексты событий, эффекты в act... функциях.
+  Более рискованные места: resolveEndOfTurn(), computeScore(), render(), структура объекта G.
+-->
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -9,8 +15,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-
-
+/* ===== RESET & BASE ===== */
+/*
+  БЛОК СТИЛЕЙ: базовый сброс браузерных стилей и общая тема приложения.
+  Здесь меняют: цвета, шрифты, базовые размеры, фон, рамки, радиусы.
+  Если хотите "косметически" улучшать игру — почти всегда начинайте отсюда, это безопасно.
+*/
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
   --bg: #0f1117;
@@ -54,8 +64,12 @@ html, body {
   overflow: hidden;
 }
 
-
-
+/* ===== HUD ===== */
+/*
+  HUD = верхняя панель со статусом игры.
+  Здесь настраивается только внешний вид верхней строки: title, KPI, время, неделя и т.д.
+  Логику значений здесь НЕ считают — их считает JavaScript ниже, а CSS только рисует.
+*/
 #hud {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
@@ -287,7 +301,7 @@ html, body {
 #manager-dev-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
 
 
-
+/* ===== MAIN COLUMNS ===== */
 #main-area {
   display: flex;
   flex: 1;
@@ -338,7 +352,7 @@ html, body {
 .col-body::-webkit-scrollbar-track { background: transparent; }
 .col-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-
+/* ===== CARDS ===== */
 .card {
   background: var(--surface2);
   border: 1px solid var(--border);
@@ -367,7 +381,7 @@ html, body {
   margin-bottom: 6px;
 }
 
-
+/* metric grid for KAM cards */
 .metric-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -399,7 +413,7 @@ html, body {
 .bar-fill.accent { background: var(--accent); }
 .bar-fill.teal { background: var(--teal); }
 
-
+/* workload pips */
 .wl-pips { display: flex; gap: 3px; align-items: center; }
 .wl-pip { width: 12px; height: 6px; border-radius: 2px; background: var(--surface3); border: 1px solid var(--border); }
 .wl-pip.on { background: var(--yellow); border-color: var(--yellow); }
@@ -426,13 +440,13 @@ html, body {
 .st-need11   { background: rgba(155,89,182,0.16); color: var(--purple);border-color: rgba(155,89,182,0.3); }
 .st-attention{ background: rgba(230,126,34,0.18); color: var(--orange);border-color: rgba(230,126,34,0.34); }
 
-
+/* urgency dots for problems */
 .urgency-dots { display: flex; gap: 3px; margin-top: 4px; }
 .urgency-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--surface3); }
 .urgency-dot.filled { background: var(--red); }
 .urgency-dot.warn { background: var(--yellow); }
 
-
+/* ===== RIGHT COLUMN (action + log) ===== */
 
 #action-panel {
   flex: 1;
@@ -496,8 +510,11 @@ html, body {
   line-height: 1.6;
 }
 
-
-
+/* ===== LOG ===== */
+/*
+  Журнал событий внизу/сбоку.
+  Это только оформление лога; сами записи добавляются функцией log() и другими JS-функциями ниже.
+*/
 
 
 
@@ -512,8 +529,11 @@ html, body {
 .log-entry.warn { color: var(--yellow); }
 
 
-
-
+/* ===== MODALS ===== */
+/*
+  Окна-попапы: события недели, предупреждения, дебриф.
+  Здесь правится внешний вид модалок. Если нужно менять тексты и логику модалок — это уже в JS ниже.
+*/
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -589,7 +609,7 @@ html, body {
 }
 .modal-btn.secondary:hover { border-color: var(--accent-dim); background: var(--surface3); }
 
-
+/* Debrief */
 .debrief-stats { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
 .debrief-stat {
   background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
@@ -603,7 +623,7 @@ html, body {
 .outcome-label.partial { color: var(--yellow); }
 .outcome-label.loss { color: var(--red); }
 
-
+/* arcade score */
 .score-block {
   text-align: center;
   background: linear-gradient(180deg, #1a1d27 0%, #11131c 100%);
@@ -652,14 +672,14 @@ html, body {
   border-left: 3px solid var(--accent-dim);
 }
 
-
+/* Warn modal */
 .warn-modal-text { font-size: 13px; color: var(--text-dim); line-height: 1.6; margin-bottom: 14px; }
 .warn-item {
   background: rgba(231,76,60,0.1); border: 1px solid rgba(231,76,60,0.25);
   border-radius: 6px; padding: 6px 10px; font-size: 11px; color: var(--red); margin-bottom: 5px;
 }
 
-
+/* Color helpers */
 .c-green { color: var(--green); }
 .c-red { color: var(--red); }
 .c-yellow { color: var(--yellow); }
@@ -672,7 +692,7 @@ html, body {
   font-size: 10px; color: var(--text-muted); text-align: center; padding: 16px 8px; font-style: italic;
 }
 
-
+/* ===== TUTORIAL ===== */
 #tutorial-modal {
   position: fixed; inset: 0; background: rgba(0,0,0,0.82); z-index: 1100;
   display: flex; align-items: center; justify-content: center; backdrop-filter: blur(3px);
@@ -716,7 +736,7 @@ html, body {
 .tut-dot.active { background: var(--accent); }
 .tut-dot.done { background: var(--green); }
 
-
+/* hint bar */
 #hint-bar {
   background: rgba(79,142,247,0.08); border-bottom: 1px solid rgba(79,142,247,0.2);
   padding: 5px 16px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; transition: opacity 0.3s;
@@ -731,7 +751,7 @@ html, body {
 .hint-close:hover { color: var(--text); }
 
 
-
+/* ===== V2.5 PREMIUM MINIMAL UI OVERRIDE ===== */
 :root {
   --bg: #090b10;
   --surface: rgba(16, 19, 25, 0.88);
@@ -1513,9 +1533,9 @@ body {
 </head>
 <body>
 <div id="app">
-  
+  <!-- HUD -->
   <div id="hud">
-    <div class="hud-title">LM Simulator<small>Version 2.9.0 · MetaSkillStudio</small></div>
+    <div class="hud-title">LM Simulator<small>Version 2.9.0 · FMCG Achievements</small></div>
     <div class="hud-sep"></div>
     <div class="hud-stat">
       <div class="hud-stat-label">Неделя</div>
@@ -1547,19 +1567,19 @@ body {
     <button id="manager-dev-btn" onclick="openManagerDevModal()">Развитие</button><button id="achievements-btn" onclick="openAchievementsModal()">Ачивки</button><button id="journal-btn" onclick="openJournalModal()">Журнал</button><button id="end-turn-btn" onclick="attemptEndTurn()">Завершить неделю →</button>
   </div>
 
-  
+  <!-- Hint bar -->
   <div id="hint-bar">
     <span class="hint-bar-text" id="hint-bar-text">
       💡 <b>Защищайте план, не сжигая команду.</b> Кликните по сотруднику или проблеме — справа появятся действия. Время ограничено.
     </span>
-    
+    <!-- Generic helper only — no action-specific hints that solve the week. -->
 
     <button class="hint-close" onclick="dismissHint()">✕ скрыть</button>
   </div>
 
-  
+  <!-- Main area -->
   <div id="main-area">
-    
+    <!-- Team column -->
     <div class="column" id="col-team">
       <div class="col-header">
         Команда
@@ -1568,7 +1588,7 @@ body {
       <div class="col-body" id="team-col"></div>
     </div>
 
-    
+    <!-- Problems column -->
     <div class="column" id="col-issues">
       <div class="col-header">
         Сигналы недели
@@ -1577,7 +1597,7 @@ body {
       <div class="col-body" id="issue-col"></div>
     </div>
 
-    
+    <!-- Right panel -->
     <div class="column" id="col-right">
       <div class="col-header">Решения менеджера</div>
             <div id="action-panel">
@@ -1588,28 +1608,28 @@ body {
   </div>
 </div>
 
-
+<!-- Event modal -->
 <div class="modal-overlay hidden" id="event-modal">
   <div class="modal-box" id="event-box"></div>
 </div>
 
-
+<!-- Turn summary modal -->
 <div class="modal-overlay hidden" id="summary-modal">
   <div class="modal-box modal-turn-summary" id="summary-box"></div>
 </div>
 
-
+<!-- End-turn warn modal -->
 <div class="modal-overlay hidden" id="warn-modal">
   <div class="modal-box" id="warn-box"></div>
 </div>
 
-
+<!-- Debrief modal -->
 <div class="modal-overlay hidden" id="debrief-modal">
   <div class="modal-box" id="debrief-box"></div>
 </div>
 
 
-
+<!-- Journal modal -->
 <div class="modal-overlay hidden" id="journal-modal">
   <div class="modal-box" id="journal-box">
     <div class="modal-title">Журнал недели</div>
@@ -1620,7 +1640,7 @@ body {
   </div>
 </div>
 
-
+<!-- Manager development modal -->
 <div class="modal-overlay hidden" id="manager-dev-modal">
   <div class="modal-box" id="manager-dev-box" style="position:relative;">
     <button class="manager-dev-close" onclick="closeManagerDevModal()" aria-label="Закрыть окно развития">✕</button>
@@ -1636,7 +1656,7 @@ body {
 </div>
 
 
-
+<!-- Achievements modal -->
 <div class="modal-overlay hidden" id="achievements-modal">
   <div class="modal-box achievements-box" id="achievements-box" style="position:relative;">
     <button class="manager-dev-close" onclick="closeAchievementsModal()" aria-label="Закрыть окно достижений">✕</button>
@@ -1650,7 +1670,7 @@ body {
   </div>
 </div>
 
-
+<!-- Tutorial modal -->
 <div id="tutorial-modal">
   <div class="tut-box">
     <div class="tut-progress" id="tut-progress">
@@ -1712,16 +1732,16 @@ body {
 </div>
 
 <script>
-
-
-
-
-
-
+// ============================================================
+// KAM TYCOON V2 — GAME ENGINE
+// Hidden models (Gallup-style engagement, SLII-style situational
+// leadership) are NEVER named in UI. Player sees only actions,
+// visible states, status tags, KPI and consequences.
+// ============================================================
 const TOTAL_TURNS = 8;
 const BASE_TIME = 6;
 
-
+// Week context per turn: normal=6, pressured=5, crisis=4
 const WEEK_CONTEXT = {
   1: { time: 6, label: 'обычная', tag: null },
   2: { time: 6, label: 'обычная', tag: null },
@@ -1733,29 +1753,33 @@ const WEEK_CONTEXT = {
   8: { time: 5, label: 'напряжённая', tag: 'Финальная сдача плана' },
 };
 
-
+/*
+  G = главный объект состояния игры.
+  В нем хранится почти все текущее состояние прогона: неделя, время, сотрудники, активные проблемы, логи, разблокировки и статистика для финального счета.
+  Очень важно: если сломать структуру G, может сломаться весь файл. Новичку лучше сначала менять только значения, а не названия полей.
+*/
 const G = {
   turn: 1,
   time: 0,
   timeMax: 0,
-  teamKpiBonus: 0,        
+  teamKpiBonus: 0,        // accumulates team-action KPI bonuses applied to attainment
   selectedId: null,
-  selectedType: null,     
+  selectedType: null,     // 'employee' | 'issue' | 'team'
   turnLog: [],
   fullLog: [],
   gameOver: false,
   gameOverReason: null,
-  pendingDelayed: [],     
+  pendingDelayed: [],     // {turn, fn, desc}
   managerStyle: { control:0, development:0, delegation:0, firefighting:0 },
   problems: [],
   problemTemplatesFired: [],
-  
+  // which advanced tools the manager has learned this run
   unlocked: { instruct:false, mentor:false, delegate:false, feedback:false, training:false, recalibrate:false, checkpoint:false, retro:false },
-  
+  // per-week usage tracking, reset each new week
   teamUsed: { priorities:false, statusControl:false, training:false, recalibrate:false, retro:false },
-  empUsed: {},            
-  learnedThisWeek: [],    
-  
+  empUsed: {},            // empUsed[empId] = {instruct, mentor, delegate, oneOnOne, feedback}
+  learnedThisWeek: [],    // labels of tools learned this week, for summary
+  // behavior tracking for debrief
   bt: {
     instruct:0, mentor:0, delegate:0, oneOnOne:0, feedback:0,
     priorities:0, statusControl:0, training:0, learns:0,
@@ -1765,7 +1789,7 @@ const G = {
   },
 };
 
-
+// empty per-employee usage record
 function emptyEmpUse() { return { instruct:false, mentor:false, delegate:false, oneOnOne:false, feedback:false }; }
 function resetWeeklyLimits() {
   G.teamUsed = { priorities:false, statusControl:false, training:false };
@@ -1776,9 +1800,9 @@ function resetWeeklyLimits() {
   G.learnedThisWeek = [];
 }
 
-
-
-
+// ============================================================
+// ACHIEVEMENTS
+// ============================================================
 function currentRedCount() {
   return G.employees.filter(e => inRedZone(e)).length;
 }
@@ -1859,7 +1883,7 @@ function closeAchievementsModal() {
   if (modal) modal.classList.add('hidden');
 }
 
-
+// snapshot visible stats at week start, used to phrase the weekly summary
 function snapshotWeek() {
   G.weekStartSnapshot = {
     kpi: attainment(),
@@ -1868,9 +1892,9 @@ function snapshotWeek() {
   };
 }
 
-
-
-
+// ============================================================
+// INITIAL STATE
+// ============================================================
 function buildInitialState() {
   G.employees = [
     {
@@ -1911,7 +1935,7 @@ function buildInitialState() {
   G.gameOverReason = null;
   G.selectedId = null;
   G.selectedType = null;
-  
+  // start: only Weekly priority setting, Status control and 1:1 are available
   G.unlocked = { instruct:false, mentor:false, delegate:false, feedback:false, training:false };
   G.bt = {
     instruct:0, mentor:0, delegate:0, oneOnOne:0, feedback:0,
@@ -1924,9 +1948,9 @@ function buildInitialState() {
   snapshotWeek();
 }
 
-
-
-
+// ============================================================
+// TIME
+// ============================================================
 function weekCtx() { return WEEK_CONTEXT[G.turn] || { time: BASE_TIME, label:'обычная', tag:null }; }
 function refreshTime() {
   G.timeMax = weekCtx().time;
@@ -1934,22 +1958,22 @@ function refreshTime() {
 }
 function spendTime(n) { G.time = Math.max(0, G.time - n); }
 
-
-
-
-function readiness(e) { return (e.skill + e.motivation) / 2; } 
+// ============================================================
+// DERIVED / HIDDEN LOGIC
+// ============================================================
+function readiness(e) { return (e.skill + e.motivation) / 2; } // hidden
 function attainment() {
-  
+  // KPI attainment = weighted team kpi contribution + accumulated team bonuses
   const avg = G.employees.reduce((s,e)=>s+e.kpi,0) / G.employees.length;
   return clamp(Math.round(avg + G.teamKpiBonus), 0, 100);
 }
 function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
 
-
+// Critical state helpers
 function inRedZone(e) { return e.motivation <= 3 || e.workload >= 3; }
 function criticalState(e) { return e.motivation <= 2 && e.workload >= 3; }
 
-
+// Status tags (visible) derived from hidden logic
 function statusTags(e) {
   const tags = [];
   if (e.workload >= 3) tags.push({ t:'перегружен', c:'st-over' });
@@ -1958,18 +1982,18 @@ function statusTags(e) {
   if (e.skill >= 7 && e.motivation >= 6 && e.workload <= 2) tags.push({ t:'готов к большему', c:'st-deleg' });
   if (e.recentUnderperf) tags.push({ t:'недорабатывает', c:'st-attention' });
   if (tags.length === 0) tags.push({ t:'стабилен', c:'st-stable' });
-  
+  // cap to 2 tags to keep cards readable
   return tags.slice(0, 2);
 }
 
-
+// Is this employee an "urgent signal" worth surfacing in HUD?
 function isUrgent(e) {
   return e.workload >= 3 || e.motivation <= 3 || e.attentionDebt >= 2;
 }
 
-
-
-
+// ============================================================
+// LOGGING
+// ============================================================
 function log(msg, type='now') {
   G.turnLog.push({ msg, type });
   G.fullLog.push({ turn: G.turn, msg, type });
@@ -1978,11 +2002,15 @@ function log(msg, type='now') {
 }
 function logDelay(msg) { log('↳ позже: ' + msg, 'delayed'); }
 
-
-
-
-
-
+// ============================================================
+// RENDER
+// ============================================================
+/*
+  РЕНДЕР ИНТЕРФЕЙСА: здесь игра превращает состояние G в HTML на экране.
+  Если что-то не показывается, не обновляется или выглядит "не тем" — часто проблема в этом разделе.
+  Если вы хотите просто поменять тексты кнопок/подписей, это одно из самых безопасных мест для правок.
+*/
+// ============================================================
 function render() {
   renderHUD();
   renderTeam();
@@ -2021,7 +2049,7 @@ function renderHUD() {
   probEl.textContent = activeProblems;
   probEl.className = 'hud-stat-value ' + (activeProblems >= 1 ? 'c-red' : 'c-dim');
 
-  
+  // alerts (limit to urgent signals, max ~3)
   const alertsArr = [];
   G.employees.filter(isUrgent).slice(0,2).forEach(e => {
     if (e.workload >= 3) alertsArr.push({ text: `${e.name}: перегружен`, type: 'danger' });
@@ -2045,7 +2073,7 @@ function renderTeam() {
   const col = document.getElementById('team-col');
   document.getElementById('team-count').textContent = G.employees.length;
 
-  
+  // team-wide action selector card on top
   const teamSelected = G.selectedType === 'team';
   let html = `<div class="card ${teamSelected ? 'selected' : ''}" onclick="selectCard('__team__','team')" style="border-style:dashed">
     <div class="card-name">🧩 Вся команда — недельные действия</div>
@@ -2204,7 +2232,7 @@ function renderProblems() {
 function selectCard(id, type) {
   G.selectedId = id;
   G.selectedType = type;
-  
+  // safety: if issue is selected but no live problem with this id, fallback to team
   if (G.selectedType === 'issue') {
     const p = G.problems.find(pp => pp.id === G.selectedId && !pp.resolved);
     if (!p) {
@@ -2233,8 +2261,8 @@ function getSelectedName() {
   return '';
 }
 
-
-
+// ---- FIT EVALUATION (hidden) ----
+// returns 'good' | 'medium' | 'poor' | 'high' | 'low' depending on action
 function fitInstruct(e){ return e.skill <= 4 ? 'good' : 'poor'; }
 function fitMentor(e){ return (e.skill >= 4 && e.skill <= 6 && e.motivation >= 5) ? 'good' : 'poor'; }
 function fitDelegate(e){
@@ -2245,9 +2273,9 @@ function fitDelegate(e){
 function need11(e){ return (e.motivation <= 4 || e.attentionDebt >= 2) ? 'high' : 'low'; }
 function fitFeedback(e){ return e.recentUnderperf ? 'good' : 'poor'; }
 
-
-
-
+// NOTE: fit logic above stays fully hidden — no fit class/hint is exposed in the UI.
+// The player infers likely needs from visible stats and status tags, and learns
+// from consequences shown after the action and in the weekly summary.
 
 function renderActions() {
   const panel = document.getElementById('action-list');
@@ -2261,7 +2289,7 @@ function renderActions() {
   panel.style.display = 'block';
   noTarget.style.display = 'none';
 
-  
+  // safety: if selected issue is gone, fallback to team
   if (G.selectedType === 'issue') {
     const live = G.problems.find(p => p.id === G.selectedId && !p.resolved);
     if (!live) {
@@ -2282,7 +2310,7 @@ function renderActions() {
       groupsHtml += `<div class="action-group-label">${a.group}</div>`;
       lastGroup = a.group;
     }
-    
+    // availability: locked tool, already used this week, or not enough time
     let unavailReason = a.locked ? 'нужно сначала освоить'
       : a.used ? 'использовано на этой неделе'
       : (G.time < a.cost) ? 'не хватает времени'
@@ -2503,7 +2531,7 @@ function issueResolveActionText(p) {
     }
     return 'Навести порядок в потоке согласований и убрать лишний хвост задач.';
   }
-  
+  // CAPABILITY
   if (p && p.id === 'pb_pricefile') {
     return 'Исправить ошибку в прайс-файле и навести порядок в процессе обновления цен.';
   }
@@ -2547,7 +2575,7 @@ function issueMitigateActionText(p) {
     }
     return 'Уточнить часть вводных и согласований, но оставить возможные подвисания в процессе.';
   }
-  
+  // CAPABILITY
   if (p && p.id === 'pb_pricefile') {
     return 'Подчистить последствия ошибки в прайс-файле, но не поменять сам процесс.';
   }
@@ -2629,16 +2657,23 @@ function problemActions(p) {
   ];
 }
 
-
-
-
-
-
+// ============================================================
+// INDIVIDUAL ACTIONS
+// ============================================================
+/*
+  ДЕЙСТВИЯ ПО СОТРУДНИКАМ И ПРОБЛЕМАМ.
+  Самый полезный раздел для обучения: именно здесь видно, что делает каждая кнопка.
+  Правило чтения простое: нашли actИмяФункции -> смотрите, сколько она тратит времени, что меняет у сотрудника, что пишет в лог.
+*/
+// ============================================================
 function getEmp(id){ return G.employees.find(e => e.id === id); }
 
 function empUse(id){ return (G.empUsed[id] ||= emptyEmpUse()); }
 
-
+/*
+  Обучение руководителя: тратит 1 время и открывает новый управленческий инструмент.
+  Если хотите менять скорость раскрытия игры — это одна из главных функций.
+*/
 function actLearn(key){
   if (G.time < 1 || G.unlocked[key]) return;
   spendTime(1);
@@ -2650,7 +2685,7 @@ function actLearn(key){
   postAction();
 }
 
-
+/* Инструктирование: обычно быстрый способ помочь слабому/новому сотруднику, но не самый сильный для долгого развития. */
 function actInstruct(id){
   if (!G.unlocked.instruct) return;
   const u = empUse(id); if (u.instruct) return;
@@ -2671,7 +2706,7 @@ function actInstruct(id){
   postAction();
 }
 
-
+/* Наставничество: более развивающее действие, чаще лучше работает на людях с потенциалом. */
 function actMentor(id){
   if (!G.unlocked.mentor) return;
   const u = empUse(id); if (u.mentor) return;
@@ -2691,7 +2726,7 @@ function actMentor(id){
   postAction();
 }
 
-
+/* Делегирование: сильный, но рискованный инструмент. Плохо подходит слабым/перегруженным людям. */
 function actDelegate(id){
   if (!G.unlocked.delegate) return;
   const u = empUse(id); if (u.delegate) return;
@@ -2721,7 +2756,7 @@ function actDelegate(id){
   postAction();
 }
 
-
+/* 1:1: базовый контакт с сотрудником. Часто полезен для мотивации, внимания и стабилизации. */
 function actOneOnOne(id){
   const u = empUse(id); if (u.oneOnOne) return;
   if (G.time < 2) return;
@@ -2740,7 +2775,7 @@ function actOneOnOne(id){
   postAction();
 }
 
-
+/* Обратная связь: точечное вмешательство после ошибки или просадки. */
 function actFeedback(id){
   if (!G.unlocked.feedback) return;
   const u = empUse(id); if (u.feedback) return;
@@ -2761,10 +2796,13 @@ function actFeedback(id){
   postAction();
 }
 
-
-
-
-
+// ============================================================
+// TEAM ACTIONS
+// ============================================================
+/*
+  Приоритеты недели: задает фокус хода.
+  Это одно из ключевых weekly actions. Хорошее место для настройки стиля игры: KPI-first или team-stability-first.
+*/
 function actPriorities(){
   if (G.teamUsed.priorities) return;
   if (G.time < 2) return;
@@ -2772,7 +2810,7 @@ function actPriorities(){
   G.bt.priorities++; styleTilt('control', 1);
   const overloaded = G.employees.filter(e => e.workload >= 2).sort((a,b)=>b.workload-a.workload).slice(0,2);
   overloaded.forEach(e => { e.workload = clamp(e.workload - 1, 0, 3); });
-  
+  // team chaos = multiple low-motivation employees
   const chaos = G.employees.filter(e => e.motivation <= 4).length >= 2;
   if (chaos) {
     G.employees.filter(e => e.motivation <= 4).slice(0,2).forEach(e => e.motivation = clamp(e.motivation + 1, 1, 10));
@@ -2783,7 +2821,10 @@ function actPriorities(){
   postAction();
 }
 
-
+/*
+  Контроль статуса: командное действие на неделю.
+  Если хотите сделать его слабее/сильнее/более ситуативным — менять именно здесь.
+*/
 function actStatusControl(){
   if (G.teamUsed.statusControl) return;
   if (G.time < 1) return;
@@ -2796,7 +2837,7 @@ function actStatusControl(){
     G.teamKpiBonus = clamp(G.teamKpiBonus + 5, -50, 50);
     log(`🔍 Контроль статуса: сняты скрытые риски (${risky.length} чел.), Team KPI +5%`, 'success');
   } else {
-    
+    // overuse penalty: demotivates strong employees
     const strong = G.employees.filter(e => e.skill >= 7 && e.motivation >= 6);
     if (strong.length) { strong[0].motivation = clamp(strong[0].motivation - 1, 1, 10); }
     log(`🔍 Контроль статуса: рисков не было — лишний контроль задевает сильных (−1 мотивация)`, 'warn');
@@ -2804,7 +2845,7 @@ function actStatusControl(){
   postAction();
 }
 
-
+/* Командное обучение: улучшает команду шире, но обычно требует unlock и времени. */
 function actTraining(){
   if (!G.unlocked.training) return;
   if (G.teamUsed.training) return;
@@ -2815,7 +2856,7 @@ function actTraining(){
   lowMid.forEach(e => { e.skill = clamp(e.skill + 1, 1, 10); });
   const stable = G.employees.filter(e => !inRedZone(e) && e.workload <= 1).slice(0,2);
   stable.forEach(e => e.motivation = clamp(e.motivation + 1, 1, 10));
-  
+  // delayed team KPI bonus
   G.pendingDelayed.push({
     turn: G.turn + 2,
     desc: 'Обучение команды дало эффект: Team KPI +5%',
@@ -2826,12 +2867,12 @@ function actTraining(){
   postAction();
 }
 
-
-
-
+// ============================================================
+// PROBLEM ACTIONS
+// ============================================================
 function getProblem(id){ return G.problems.find(p => p.id === id); }
 
-
+/* Полное закрытие weekly problem: дорогой, но чистый способ убрать бизнес-риск. */
 function actResolveProblem(id){
   const p = getProblem(id); if (!p || p.resolved) return;
   const cost = issueResolveCostByCategory(p);
@@ -2846,11 +2887,11 @@ function actResolveProblem(id){
   postAction();
 }
 
-
+/* Частичное купирование проблемы: дешево по времени, но не закрывает вопрос полностью. */
 function actMitigateProblem(id){
   const p = getProblem(id); if (!p || p.resolved) return;
   if (!G.bt.mitigatesUsed) G.bt.mitigatesUsed = {};
-  if (G.bt.mitigatesUsed[p.id]) return; 
+  if (G.bt.mitigatesUsed[p.id]) return; // уже купировали эту проблему на этой неделе
   if (G.time < 1) return;
   spendTime(1);
   p.escalation = Math.max(1, p.escalation - 1);
@@ -2921,7 +2962,7 @@ function postAction(){
   render();
 }
 
-
+// schedule a delayed KPI bump to a specific employee
 function scheduleKpi(empId, amount, turn, desc){
   G.pendingDelayed.push({
     turn, desc,
@@ -2929,15 +2970,22 @@ function scheduleKpi(empId, amount, turn, desc){
   });
 }
 
-
-
-
-
-
-
+// ============================================================
+// END TURN
+// ============================================================
+/*
+  КОНЕЦ НЕДЕЛИ: здесь происходит самое важное последствие всех решений игрока.
+  Если коротко: игра смотрит, кого игнорировали, какие проблемы не решили, что эскалировалось, какие delayed effects должны сработать.
+  Это один из самых чувствительных разделов файла. Менять можно, но аккуратно и лучше точечно.
+*/
+// ============================================================
+/*
+  Попытка завершить неделю.
+  Сначала проверяет, не остались ли опасные сигналы без внимания; если остались — показывает warning modal.
+*/
 function attemptEndTurn() {
   if (G.gameOver) return;
-  
+  // warn about ignored urgent signals
   const ignored = [];
   G.employees.filter(isUrgent).forEach(e => {
     const touched = G.turnLog.some(l => l.msg.includes(e.name) && l.type !== 'delayed');
@@ -2972,11 +3020,14 @@ function showWarnModal(warnings) {
 function closeWarnModal(){ document.getElementById('warn-modal').classList.add('hidden'); }
 function forceEndTurn(){ document.getElementById('warn-modal').classList.add('hidden'); resolveEndOfTurn(); }
 
-
+/*
+  Реальный пересчет конца недели.
+  Именно тут игра применяет накопленные последствия: долг внимания, перегруз, hidden risk, escalation problems и delayed эффекты.
+*/
 function resolveEndOfTurn() {
   if (G.time > 0) G.bt.timeUnused += G.time;
 
-  
+  // 1) Consequences for ignored employees → attention debt + drift
   G.employees.forEach(e => {
     const touched = G.turnLog.some(l => l.msg.includes(e.name) && l.type !== 'delayed');
     if (!touched) {
@@ -2990,12 +3041,12 @@ function resolveEndOfTurn() {
     } else {
       e.attentionDebt = Math.max(0, e.attentionDebt - 1);
     }
-    
+    // overload pressure: workload 3 erodes motivation
     if (e.workload >= 3) {
       e.motivation = clamp(e.motivation - 1, 1, 10);
       log(`🔴 ${e.name}: перегрузка 3/3 — мотивация −1`, 'danger');
     }
-    
+    // hidden risk converts to underperformance / kpi loss
     if (e.hiddenRisk >= 2) {
       e.kpi = clamp(e.kpi - 5, 0, 100);
       e.recentUnderperf = true;
@@ -3004,7 +3055,7 @@ function resolveEndOfTurn() {
     }
   });
 
-  
+  // 2) Unresolved problems: small generic penalty + category-specific consequences
   G.problems.filter(p => !p.resolved).forEach(p => {
     G.bt.unresolvedAtWeekEnd++;
     const genericHit = p.escalation >= 4 ? 2 : 1;
@@ -3013,7 +3064,7 @@ function resolveEndOfTurn() {
 
     applyIssueCategoryIgnoredConsequences(p);
 
-    
+    // escalation may carry over (grows if it was not even partially contained this week)
     if (!p.mitigatedThisWeek && p.escalation < 5) {
       p.escalation = Math.min(5, p.escalation + 1);
       G.bt.problemsEscalated++;
@@ -3023,7 +3074,7 @@ function resolveEndOfTurn() {
     }
     p.mitigatedThisWeek = false;
 
-    
+    // a high-escalation open problem may spawn a follow-up next week
     if (p.escalation >= 4 && !p.spawnedFollowup) {
       p.spawnedFollowup = true;
       G.pendingDelayed.push({
@@ -3042,7 +3093,7 @@ function resolveEndOfTurn() {
     }
   });
 
-  
+  // 3) Apply delayed effects due this turn
   const due = G.pendingDelayed.filter(ef => ef.turn <= G.turn);
   due.forEach(ef => { ef.fn(); log(`⏱ Отложенный эффект: ${ef.desc}`, 'now'); });
   G.pendingDelayed = G.pendingDelayed.filter(ef => ef.turn > G.turn);
@@ -3061,7 +3112,7 @@ function advanceTurn() {
   G.selectedId = null;
   G.selectedType = null;
   G.turnLog = [];
-  
+  // apply delayed effects scheduled for the start of this week (e.g. follow-up problems)
   const dueNow = G.pendingDelayed.filter(ef => ef.turn === G.turn && ef.desc === '');
   dueNow.forEach(ef => ef.fn());
   G.pendingDelayed = G.pendingDelayed.filter(ef => !(ef.turn === G.turn && ef.desc === ''));
@@ -3072,19 +3123,19 @@ function advanceTurn() {
   render();
 }
 
-
-
-
+// ============================================================
+// PROBLEM SPAWNING (keep <=1 active at a time)
+// ============================================================
 function spawnProblemsForTurn() {
   let active = G.problems.filter(p => !p.resolved).length;
-  
-  
-  const target = ([3,5,6,8].includes(G.turn)) ? 3 : 2; 
+  // Each week should usually have 1, sometimes 2 active problems.
+  // Carried-over unresolved problems count toward this; top up to a weekly target.
+  const target = ([3,5,6,8].includes(G.turn)) ? 3 : 2; // pressured/crisis/final weeks run hotter
   const cap = 3;
 
-  
+  // state-driven problem seeds (escalation 1-5)
   const seeds = [
-    
+    // FLOW / координация: всплывают при хаосе в загрузке и частом «пожарном» стиле
     { id:'pb_promo', category:'coordination', minTurn:2, name:'Промо-материалы не согласованы',
       desc:'Промо-календарь сети под угрозой — материалы не выровнены.', escalation:2,
       affects:'emp_olga', people:true,
@@ -3094,13 +3145,13 @@ function spawnProblemsForTurn() {
       affects:'emp_dmitriy', people:false,
       cond: () => G.bt.statusControl === 0 && attainment() < 80 },
 
-    
+    // CAPABILITY: всплывают при низких инвестициях в развитие
     { id:'pb_pricefile', category:'capability', minTurn:3, name:'Ошибка в прайс-файле',
       desc:'В прайс-файл попала ошибка — есть риск эскалации со стороны сети.', escalation:2,
       affects:'emp_arseniy', people:true,
       cond: () => G.bt.training === 0 && G.bt.mentor === 0 },
 
-    
+    // CLIENT / DELIVERY: завязаны на просадку KPI и скрытый риск
     { id:'pb_claim', category:'delivery', minTurn:4, name:'Претензия по дебиторке',
       desc:'Сеть удерживает оплату из-за расхождений в документах.', escalation:3,
       affects:'emp_olga', people:false,
@@ -3110,7 +3161,7 @@ function spawnProblemsForTurn() {
       affects:'emp_olga', people:false,
       cond: () => attainment() < 70 && G.employees.some(e => e.workload >= 2) },
 
-    
+    // TEAM / PEOPLE: мотив, внимание, качество исполнения
     { id:'pb_quality', category:'people', minTurn:5, name:'Жалоба сети на качество исполнения',
       desc:'Федеральная сеть недовольна качеством работы команды.', escalation:3,
       affects:'emp_dmitriy', people:true,
@@ -3120,7 +3171,7 @@ function spawnProblemsForTurn() {
       affects:'emp_dmitriy', people:true,
       cond: () => G.employees.some(e => e.attentionDebt >= 2) },
 
-    
+    // Поздние FLOW / CLIENT-эскалации в конце прогона
     { id:'pb_approval', category:'coordination', minTurn:5, name:'Застрявшее внутреннее согласование',
       desc:'Кросс-функционально зависла важная для клиента тема.', escalation:2,
       affects:'emp_arseniy', people:false,
@@ -3147,9 +3198,9 @@ function spawnProblemsForTurn() {
   }
 }
 
-
-
-
+// ============================================================
+// EVENTS (decision modals, state-driven, low randomness)
+// ============================================================
 let currentEvent = null;
 function maybeFireEvent() {
   const events = [
@@ -3186,7 +3237,10 @@ function maybeFireEvent() {
   if (data) showEventModal(data);
 }
 
-
+/*
+  Событие про сильного сотрудника, который хочет больше самостоятельности.
+  Хорошее место, чтобы менять ощущение от делегирования и развития сильных людей.
+*/
 function buildStretchEvent() {
   const hp = G.employees.find(e => e.skill >= 7 && e.motivation >= 6 && e.workload <= 2);
   if (!hp) return null;
@@ -3205,7 +3259,10 @@ function buildStretchEvent() {
   };
 }
 
-
+/*
+  Событие про перегруз/выгорание.
+  Через него легко настраивать цену выбора между краткосрочным результатом и сохранением человека.
+*/
 function buildBurnoutEvent() {
   const e = G.employees.find(x => x.workload >= 2 && x.motivation <= 4);
   if (!e) return null;
@@ -3225,7 +3282,10 @@ function buildBurnoutEvent() {
   };
 }
 
-
+/*
+  Событие про ошибку/недоработку.
+  Здесь настраивается, насколько игра ценит разбор ошибок против экономии времени.
+*/
 function buildUnderperfEvent() {
   const e = G.employees.find(x => x.skill <= 5 && x.kpi < 55);
   if (!e) return null;
@@ -3363,7 +3423,10 @@ function buildDelegateRecoveryEvent() {
   };
 }
 
-
+/*
+  Показывает модалку события недели.
+  Если хотите снова показывать больше или меньше информации перед выбором, менять это место.
+*/
 function showEventModal(evt) {
   const modal = document.getElementById('event-modal');
   const box = document.getElementById('event-box');
@@ -3390,11 +3453,11 @@ function resolveEvent(i) {
   render();
 }
 
-
-
-
-
-
+// ============================================================
+// TURN SUMMARY
+// ============================================================
+// Build short business-language sentences comparing week start to week end.
+// Does NOT expose formulas, theory or hidden model names.
 function buildWeekNarrative() {
   const snap = G.weekStartSnapshot;
   const improved = [], worsened = [], unresolved = [], carried = [];
@@ -3419,7 +3482,7 @@ function buildWeekNarrative() {
       }
     });
   }
-  
+  // problems still open
   G.problems.filter(p => !p.resolved).forEach(p => {
     const wasOpen = snap && snap.openProblems.some(o => o.id === p.id);
     if (wasOpen) carried.push(`«${p.name}» перешла на следующую неделю (эскалация ${p.escalation}/5).`);
@@ -3507,9 +3570,9 @@ function closeTurnSummary() {
   advanceTurn();
 }
 
-
-
-
+// ============================================================
+// INSTANT GAME OVER (2+ critical employees)
+// ============================================================
 function checkInstantGameOver() {
   if (G.gameOver) return;
   const critical = G.employees.filter(criticalState).length;
@@ -3520,12 +3583,19 @@ function checkInstantGameOver() {
   }
 }
 
-
-
-
-
-
-
+// ============================================================
+// SCORING + DEBRIEF
+// ============================================================
+/*
+  ФИНАЛЬНЫЙ СЧЕТ И ДЕБРИФ.
+  Если хотите сделать игру щедрее или жестче по очкам — идите сюда.
+  Главные точки: computeScore() считает цифры, scoreBand() задает уровни результата, showDebrief() показывает финальный экран.
+*/
+// ============================================================
+/*
+  Считает итоговый score из KPI, стабильности команды, мотивации, развития менеджера и штрафов.
+  Это лучшая функция для первых баланс-правок, если вы хотите просто сделать симуляцию легче или сложнее.
+*/
 function computeScore() {
   const kpi = attainment();
   const redCount = G.employees.filter(inRedZone).length;
@@ -3538,30 +3608,30 @@ function computeScore() {
   const bt = G.bt;
 
   const parts = [];
-  
-  
+  // Base from final KPI attainment. Tuned so KPI alone tops out ~5600;
+  // bonuses must be earned to reach strong/elite bands (7500/9500).
   const base = Math.round(kpi * 65);
   parts.push({ label:'База за KPI плана ('+kpi+'%)', val: base });
 
-  
+  // team stability bonus (no one in the red zone)
   const stableBonus = (3 - redCount) * 500;
   parts.push({ label:'Стабильность команды', val: stableBonus });
 
-  
+  // overload-free bonus
   const overloadBonus = overloaded === 0 ? 500 : (overloaded === 1 ? 150 : 0);
   parts.push({ label:'Отсутствие перегруза', val: overloadBonus });
 
-  
+  // healthy motivation bonus
   const motBonus = avgMot >= 7 ? 700 : avgMot >= 6 ? 450 : avgMot >= 5 ? 200 : 0;
   parts.push({ label:'Здоровая мотивация (ср. '+avgMot.toFixed(1)+')', val: motBonus });
 
-  
-  
+  // useful manager development: unlocking + actually using developed tools.
+  // Pure learning without applying it is worth little; applied development pays off.
   const appliedDev = bt.mentor + bt.training + bt.delegate;
   const devBonus = clamp(unlockedCount * 200 + appliedDev * 150, 0, 1400);
   parts.push({ label:'Развитие руководителя', val: devBonus });
 
-  
+  // penalties
   const penalties = [];
   if (openEscalation > 0) penalties.push({ label:'Открытые эскалации к финалу', val: -openEscalation * 350 });
   if (bt.unresolvedAtWeekEnd > 0) penalties.push({ label:'Проблемы, оставленные на финиш недель', val: -Math.min(bt.unresolvedAtWeekEnd, 8) * 120 });
@@ -3575,7 +3645,10 @@ function computeScore() {
   return { total, parts, penalties, kpi, redCount, criticalCount, avgMot, unlockedCount };
 }
 
-
+/*
+  Переводит итоговые очки в словесную оценку: elite / strong / decent / weak / fail.
+  Самое безопасное место, чтобы быстро изменить "пороги успеха" без ломки всей экономики.
+*/
 function scoreBand(total) {
   if (total >= 9000) return { cls:'band-elite', label:'🏆 Элитный прогон' };
   if (total >= 7000) return { cls:'band-strong', label:'💪 Сильный прогон' };
@@ -3584,7 +3657,10 @@ function scoreBand(total) {
   return { cls:'band-fail', label:'💥 Провальный прогон' };
 }
 
-
+/*
+  Собирает и показывает финальный экран прогона.
+  Здесь можно менять тексты выводов, блоки статистики и обучающие takeaways для игрока.
+*/
 function showDebrief() {
   const modal = document.getElementById('debrief-modal');
   const box = document.getElementById('debrief-box');
@@ -3594,7 +3670,7 @@ function showDebrief() {
   const s = computeScore();
   const band = scoreBand(s.total);
 
-  
+  // graded outcome
   let outcome, outcomeClass, outcomeDesc;
   if (G.gameOverReason) {
     outcome = '💥 Провал'; outcomeClass = 'loss'; outcomeDesc = G.gameOverReason;
@@ -3614,7 +3690,7 @@ function showDebrief() {
     outcomeDesc = 'KPI ниже 50% — план по сети не выполнен.';
   }
 
-  
+  // takeaways
   const bt = G.bt;
   const takeaways = [];
   const archetype = managerArchetype();
@@ -3677,6 +3753,56 @@ function showDebrief() {
 
     <button class="modal-btn" onclick="restartGame()">🔄 Сыграть ещё раз</button>
   `;
+  
+  // Вызов отправки результата в Google Таблицу
+  sendScoreToSheet(s);
+}
+
+// ============================================================
+// ОТПРАВКА РЕЗУЛЬТАТА В GOOGLE ТАБЛИЦУ
+// ============================================================
+
+// Генерирует или получает ID игрока
+function getPlayerId() {
+  // 1. Сначала проверяем URL — вдруг передали имя через ?user=Иванов
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlName = urlParams.get('user') || urlParams.get('name');
+  if (urlName) return urlName;
+
+  // 2. Если в этой вкладке уже играли — берём сохранённый ID
+  const storedId = sessionStorage.getItem('playerId');
+  if (storedId) return storedId;
+
+  // 3. Иначе генерируем новый уникальный ID
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let id = 'player_';
+  for (let i = 0; i < 6; i++) {
+    id += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  sessionStorage.setItem('playerId', id);
+  return id;
+}
+
+function sendScoreToSheet(scoreData) {
+  const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzKQ1ft6tz1i1lNE4Lh1OwP6xbSx_UzZETXKWawG4YX2eppI2dRv_pk2MWRQwbfHBjGiQ/exec';
+  
+  const playerId = getPlayerId();
+
+  const payload = {
+    name: playerId,
+    score: scoreData.total,
+    kpi: scoreData.kpi + '%',
+    red_zone: scoreData.redCount,
+    avg_motivation: scoreData.avgMot.toFixed(1),
+    band: scoreBand(scoreData.total).label
+  };
+
+  fetch(WEB_APP_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload),
+    mode: 'no-cors'
+  }).catch(err => console.log('Не удалось отправить результат:', err));
 }
 
 function restartGame() {
@@ -3691,9 +3817,9 @@ function restartGame() {
   log('🛒 Новый прогон. Неделя 1 из 8.', 'now');
 }
 
-
-
-
+// ============================================================
+// LOG RENDER
+// ============================================================
 function renderLog() {
   const body = document.getElementById('journal-log-body');
   const empty = document.getElementById('journal-empty');
@@ -3712,9 +3838,9 @@ function renderLog() {
   body.scrollTop = 0;
 }
 
-
-
-
+// ============================================================
+// TUTORIAL + HINT
+// ============================================================
 let tutCurrentStep = 0;
 const TUT_TOTAL = 3;
 function tutNext() {
@@ -3751,9 +3877,9 @@ function updateHintBar() {
 }
 function dismissHint() { document.getElementById('hint-bar').classList.add('hidden'); }
 
-
-
-
+// ============================================================
+// INIT
+// ============================================================
 buildInitialState();
 log('🛒 Прогон запущен. Неделя 1 из 8.', 'now');
 log(`Время недели: ${G.timeMax} ⏱ · KPI плана: ${attainment()}% · цель 80%+`, 'now');
@@ -3772,7 +3898,23 @@ render();
 (function () {
   if (window === window.top) return;
 
-  const allowedParentOrigins = ["https://www.perplexity.ai","https://perplexity.ai","https://testing.perplexity.ai","https://staging.perplexity.ai","https:/g, "[^.]+") +
+  const allowedParentOrigins = ["https://www.perplexity.ai","https://perplexity.ai","https://testing.perplexity.ai","https://staging.perplexity.ai","https://*.preview.i.perplexity.ai","http://localhost:3000","http://127.0.0.1:3000","http://localhost:5173","http://127.0.0.1:5173"];
+  const MAX_FONT_BYTES = 500 * 1024;
+  const MAX_TOTAL_FONT_BYTES = 2 * 1024 * 1024;
+  let scrollForwarding = false;
+  let scrollRaf = 0;
+  let trustedTopOrigin = null;
+
+  function matchesAllowedOrigin(origin) {
+    if (!origin) return false;
+    for (const entry of allowedParentOrigins) {
+      if (!entry.includes("*")) {
+        if (entry === origin) return true;
+        continue;
+      }
+      const pattern = new RegExp(
+        "^" +
+          entry.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, "[^.]+") +
           "$",
       );
       if (pattern.test(origin)) return true;
@@ -4052,7 +4194,3 @@ render();
 })();
 </script></body>
 </html>
-
-
-
-
