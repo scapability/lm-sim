@@ -1,26 +1,13 @@
 <!DOCTYPE html>
-<!--
-  ОБУЧАЮЩАЯ ВЕРСИЯ ФАЙЛА
-  Что это: одностраничный HTML-прототип симулятора руководителя.
-  Как с ним работать: сначала ищите большие блоки по комментариям ===== ... =====, потом уже меняйте числа и тексты внутри функций.
-  Самые безопасные места для первых правок: тексты интерфейса, стоимость действий, пороги scoreBand(), тексты событий, эффекты в act... функциях.
-  Более рискованные места: resolveEndOfTurn(), computeScore(), render(), структура объекта G.
--->
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LM Simulator V2.9.2 (metaskillstudio.ru)</title>
+<title>LM Simulator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-/* ===== RESET & BASE ===== */
-/*
-  БЛОК СТИЛЕЙ: базовый сброс браузерных стилей и общая тема приложения.
-  Здесь меняют: цвета, шрифты, базовые размеры, фон, рамки, радиусы.
-  Если хотите "косметически" улучшать игру — почти всегда начинайте отсюда, это безопасно.
-*/
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
   --bg: #0f1117;
